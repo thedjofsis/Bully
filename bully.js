@@ -48,7 +48,7 @@ for (let i = 0; i < Bully.servers.length; i++) {
 		Bully.connections.push(Bully); //push it to the connections array
 	} else { //else
 		let options = {
-			timeout: 1,
+			timeout: 2,
 		};
 		let c = new zerorpc.Client(options); // create new client which will communicate with other servers from the list
 		c.connect('tcp://' + Bully.servers[i]); //connect it
@@ -60,11 +60,11 @@ for (let i = 0; i < Bully.servers.length; i++) {
 
 
 //Bully Methods
-Bully.areYouThere = function(param, reply) { //when areYouThere is called by a client,
+Bully.areYouThere = function(reply) { //when areYouThere is called by a client,
 	reply(null, true); //return True using ZeroRPC Method
 };
 
-Bully.areYouNormal = function(param, reply) {
+Bully.areYouNormal = function(reply) {
 	if (this.S.state == 'Normal') {
 		reply(null, true);
 	} else {
@@ -99,15 +99,27 @@ Bully.ready = function(nb, reply) { //When ready is called...
 
 Bully.syncFuncCall = function(func_name, client_test, param=null) {
 	return new Promise((resolve, reject) => {
-		client_test.invoke(func_name, param, function(error, res, more) {
+		if (param != null){
+			client_test.invoke(func_name, param, function(error, res, more) {
 			
-			if (error) {
-				return reject(error);
-			} else {
-				return resolve(res);
-			}
+				if (error) {
+					return reject(error);
+				} else {
+					return resolve(res);
+				}
 
-		});
+			});
+		} else {
+			client_test.invoke(func_name, function(error, res, more) {
+			
+				if (error) {
+					return reject(error);
+				} else {
+					return resolve(res);
+				}
+
+			});
+		}
 	});
 };
 
@@ -144,6 +156,7 @@ Bully.election = function() { // When election is called...
 					console.log(`I am ${this.S.state}`);
 					this.S.halt = this.priority;
 					this.S.Up = [];
+					this.serverListBackup=[];
 					this.S.Up.push(this);
 					this.serverListBackup.push(this.servers[this.priority]);
 					var counter = 0;
@@ -267,7 +280,7 @@ Bully.check = function() {
 					this.timeout();
 				});
 		}
-	},5000);
+	},10000);
 	// sleep.sleep(10);
 	// }
 	

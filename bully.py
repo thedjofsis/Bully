@@ -31,10 +31,10 @@ class bully():
 				c.connect('tcp://' + server)
 				self.connections.append(c)
 
-	def are_you_there(self):
+	def areYouThere(self):
 		return True
 
-	def are_you_normal(self):
+	def areYouNormal(self):
 		if self.S.state == 'Normal':
 			return True
 		else:
@@ -44,8 +44,8 @@ class bully():
 		self.S.state = 'Election'
 		self.S.halt = j
 
-	def new_coordinator(self, j):
-		print 'call new_coordinator'
+	def newCoordinator(self, j):
+		print 'call new coordinator'
 		if self.S.halt == j and self.S.state == 'Election':
 			self.S.coord = j
 			self.S.state = 'Reorganization'
@@ -60,7 +60,7 @@ class bully():
 
 		for i, server in enumerate(self.servers[self.priority + 1:]):
 			try:
-				self.connections[self.priority + 1 + i].are_you_there()
+				self.connections[self.priority + 1 + i].areYouThere()
 				if self.check_servers_greenlet is None:
 					self.S.coord = self.priority + 1 + i
 					self.S.state = 'Normal'
@@ -90,7 +90,7 @@ class bully():
 		print 'I am ', self.S.state
 		for j in self.S.Up:
 			try:
-				j.new_coordinator(self.priority)
+				j.newCoordinator(self.priority)
 			except zerorpc.TimeoutExpired:
 				print 'Timeout! 3 (election has to be restarted)'
 				self.election()
@@ -121,14 +121,14 @@ class bully():
 			else:
 				print 'I am Normal'
 
-			gevent.sleep(10)
+			gevent.sleep(5)
 			
 			if self.S.state == 'Normal' and self.S.coord == self.priority:
 				for i, server in enumerate(self.servers):
 					if i != self.priority:
 						try:
-							ans = self.connections[i].are_you_normal()
-							# print '%s : are_you_normal = %s' % (server, ans)
+							ans = self.connections[i].areYouNormal(param=None)
+							# print '%s : areYouNormal param=null= %s' % (server, ans)
 						except zerorpc.TimeoutExpired:
 							print '%s Timeout! 5 (normal node unreachable)' % server
 							continue
@@ -139,7 +139,7 @@ class bully():
 			elif self.S.state == 'Normal' and self.S.coord != self.priority:
 				print 'check coordinator\'s state'
 				try:
-					result = self.connections[self.S.coord].are_you_there()
+					result = self.connections[self.S.coord].areYouThere()
 					print 'Is the coordinator %s up = %s' % (self.servers[self.S.coord], result)
 				except zerorpc.TimeoutExpired:
 					print 'coordinator down, start election.'
@@ -148,7 +148,7 @@ class bully():
 	def timeout(self):
 		if self.S.state == 'Normal' or self.S.state == 'Reorganization':
 			try:
-				self.connections[self.S.coord].are_you_there()
+				self.connections[self.S.coord].areYouThere()
 			except zerorpc.TimeoutExpired:
 				print '%s Timeout! 6' % self.servers[self.S.coord]
 				self.election()
