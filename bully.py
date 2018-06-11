@@ -75,7 +75,7 @@ class bully():
 		print '%shalt all lower priority nodes including this node%s' % (fg(3), attr(0))
 		self.halt(self.priority)
 		self.S.state = 'Election'
-		print '%sI am %s%s' % (fg(3), self.S.state, attr(0))
+		print 'I am %s' % self.S.state
 		self.S.halt = self.priority
 		self.S.Up = []
 		self.serverListBackup = []
@@ -162,7 +162,7 @@ class bully():
 				print '%s%s Timeout 6! coordinator down, start election%s' % (fg(1), self.servers[self.S.coord], attr(0))
 				self.election()
 		else:
-			print 'starting election'
+			print '%sstarting election%s' % (fg(3), attr(0))
 			self.election()
 
 	def initialize(self):
