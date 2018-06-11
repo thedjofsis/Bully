@@ -210,7 +210,7 @@ Bully.election = function() { // When election is called...
 																		this.election();
 																		return;
 																	} else {
-																		console.log(`${this.serverListBackup[0]} server is ready`.red);
+																		console.log(`${this.serverListBackup[0]} server is ready`.green);
 																	}
 																})
 																.finally(() => {
