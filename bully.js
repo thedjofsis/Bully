@@ -243,9 +243,9 @@ Bully.check = function() {
 	setInterval(()=>{
 		console.log('My address is ', this.addr);
 		if (this.S.coord == this.priority) {
-			console.log('I am Coordinator'.italic);
+			console.log('I am Coordinator');
 		} else {
-			console.log('I am Normal'.italic);
+			console.log('I am Normal');
 		}
 		if (this.S.state == 'Normal' && this.S.coord == this.priority) {
 			for (let i = 0; i < this.servers.length; i++) {
