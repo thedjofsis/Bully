@@ -154,7 +154,7 @@ Bully.election = function() { // When election is called...
 			.finally(() => {
 				if (counter4==restOfElements.length && !checker){
 					console.log('halt all lower priority nodes including this node'.yellow);
-					console.log(`${this.servers[this.priority]}: I halted myself`.yellow);
+					console.log(`${this.servers[this.priority]}: I halted myself`.green);
 					this.S.state = 'Election';
 					console.log(`I am ${this.S.state}`);
 					this.S.halt = this.priority;
@@ -192,7 +192,7 @@ Bully.election = function() { // When election is called...
 														this.election();
 														return;
 													} else {
-														console.log("Declaring myself as coordinator".red);
+														console.log("Declaring myself as coordinator".yellow);
 													}
 												})
 												.finally(() => {
