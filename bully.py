@@ -122,6 +122,7 @@ class bully():
 				print 'I am Normal'
 
 			gevent.sleep(10)
+			
 			if self.S.state == 'Normal' and self.S.coord == self.priority:
 				for i, server in enumerate(self.servers):
 					if i != self.priority:
