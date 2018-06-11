@@ -17,6 +17,8 @@ class bully():
 		print 'My addr: %s' % self.addr
 		print 'Server list: %s' % (str(self.servers))
 
+		self.serverListBackup = [];
+
 		self.n = len(self.servers)
 
 		self.connections = []
@@ -51,7 +53,7 @@ class bully():
 			self.S.state = 'Reorganization'
 
 	def ready(self, j, x=None):
-		print 'call ready'
+		print 'I am ready'
 		if self.S.coord == j and self.S.state == "Reorganization":
 			self.S.state = 'Normal'
 
@@ -67,7 +69,7 @@ class bully():
 					self.check_servers_greenlet = self.pool.spawn(self.check())
 				return
 			except zerorpc.TimeoutExpired:
-				print '%s Timeout! 1 (checking for election)' % server
+				print "%s Timeout 1! Server offline, can't choose this as a coordinator" % server
 
 		print 'halt all lower priority nodes including this node:'
 		self.halt(self.priority)
@@ -75,33 +77,38 @@ class bully():
 		print 'I am ', self.S.state
 		self.S.halt = self.priority
 		self.S.Up = []
+		self.serverListBackup = []
 		for i, server in enumerate(self.servers[self.priority::-1]):
 			try:
 				self.connections[i].halt(self.priority)
+				print '%s server halted successfully!' % server
 			except zerorpc.TimeoutExpired:
-				print '%s Prompt: I have halted myself' % server
+				print '%s Timeout 2! server not reachable, cannot halt' % server
 				continue
 			self.S.Up.append(self.connections[i])
+			self.serverListBackup.append(self.servers[i])
 
 		# reached the election point, now inform other nodes of new coordinator
 		print 'inform all nodes of new coordinator:'
 		self.S.coord = self.priority
 		self.S.state = 'Reorganization'
 		print 'I am ', self.S.state
-		for j in self.S.Up:
+		for i, j in enumerate(self.S.Up):
 			try:
 				j.newCoordinator(self.priority)
+				print '%s server received new coordinator!' % self.serverListBackup[i]
 			except zerorpc.TimeoutExpired:
-				print 'Timeout! 3 (election has to be restarted)'
+				print '%s Timeout 3! server not reachable, election has to be restarted' % self.serverListBackup[i]
 				self.election()
 				return
 
 		# Reorganization
-		for j in self.S.Up:
+		for i, j in enumerate(self.S.Up):
 			try:
 				j.ready(self.priority)
+				print '%s server is ready' % self.serverListBackup[i]
 			except zerorpc.TimeoutExpired:
-				print 'Timeout! 4'
+				print '%s Timeout 4! server lost connection, election has to be restarted' % self.serverListBackup[i]
 				self.election()
 				return
 
@@ -128,31 +135,34 @@ class bully():
 					if i != self.priority:
 						try:
 							ans = self.connections[i].areYouNormal(param=None)
-							# print '%s : areYouNormal param=null= %s' % (server, ans)
+							print '%s node is Up!' % server
 						except zerorpc.TimeoutExpired:
-							print '%s Timeout! 5 (normal node unreachable)' % server
+							print '%s Timeout 5! normal node unreachable' % server
 							continue
 
 						if not ans:
+							print '%s this node is not normal! starting election'
 							self.election()
 							return
 			elif self.S.state == 'Normal' and self.S.coord != self.priority:
 				print 'check coordinator\'s state'
 				try:
 					result = self.connections[self.S.coord].areYouThere()
-					print 'Is the coordinator %s up = %s' % (self.servers[self.S.coord], result)
+					print '%s coordinator is up' % self.servers[self.coord]
 				except zerorpc.TimeoutExpired:
-					print 'coordinator down, start election.'
+					print '%s coordinator down, start election' % self.servers[self.coord]
 					self.timeout()
 
 	def timeout(self):
 		if self.S.state == 'Normal' or self.S.state == 'Reorganization':
 			try:
 				self.connections[self.S.coord].areYouThere()
+				print '%s coordinator alive' % self.servers[self.coord]
 			except zerorpc.TimeoutExpired:
-				print '%s Timeout! 6' % self.servers[self.S.coord]
+				print '%s Timeout 6! coordinator down, start election' % self.servers[self.S.coord]
 				self.election()
 		else:
+			print 'starting election'
 			self.election()
 
 	def initialize(self):
