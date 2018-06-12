@@ -1,0 +1,30 @@
+{
+  "name": "bully",
+  "version": "1.0.0",
+  "description": "### Requirements: 1. Python (2.7x) - pip install zerorpc gevent colored 2. NodeJS (8x) - npm install                [the required libraries are given in package.json, npm version 6.1]",
+  "main": "bully.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thedjofsis/Bully.git"
+  },
+  "keywords": [
+    "bully",
+    "algorithm",
+    "distributed",
+    "systems"
+  ],
+  "author": "Clement Helardot & Dharm Skandh Jain",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thedjofsis/Bully/issues"
+  },
+  "homepage": "https://github.com/thedjofsis/Bully#readme",
+  "dependencies": {
+    "colors": "^1.3.0",
+    "promise.prototype.finally": "^3.1.0",
+    "zerorpc": "^0.9.7"
+  }
+}
