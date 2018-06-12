@@ -29,9 +29,9 @@ Bully.checkServerPool = null; //empty pool
 
 const address = process.argv[2]; //get server + port
 Bully.addr = address; //assign it
-Bully.config_file = 'server_config_local'; //confile file name
+// Bully.config_file = 'server_config_local'; //confile file name
 // Bully.config_file = 'server_config_local_connected';
-//Bully.config_file = 'server_config_multi';
+Bully.config_file = 'server_config_multi';
 
 Bully.servers = []; //empty array of servers
 Bully.serverListBackup = [];

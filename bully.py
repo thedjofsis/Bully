@@ -148,16 +148,16 @@ class bully():
 				print '%scheck coordinator\'s state%s' % (fg(3), attr(0))
 				try:
 					result = self.connections[self.S.coord].areYouThere()
-					print '%s%s coordinator is up%s' % (fg(2), self.servers[self.coord], attr(0))
+					print '%s%s coordinator is up%s' % (fg(2), self.servers[self.S.coord], attr(0))
 				except zerorpc.TimeoutExpired:
-					print '%s%s coordinator down, start election%s' % (fg(3), self.servers[self.coord], attr(0))
+					print '%s%s coordinator down, start election%s' % (fg(3), self.servers[self.S.coord], attr(0))
 					self.timeout()
 
 	def timeout(self):
 		if self.S.state == 'Normal' or self.S.state == 'Reorganization':
 			try:
 				self.connections[self.S.coord].areYouThere()
-				print '%s%s coordinator alive%s' % (fg(2), self.servers[self.coord], attr(0))
+				print '%s%s coordinator alive%s' % (fg(2), self.servers[self.S.coord], attr(0))
 			except zerorpc.TimeoutExpired:
 				print '%s%s Timeout 6! coordinator down, start election%s' % (fg(1), self.servers[self.S.coord], attr(0))
 				self.election()
